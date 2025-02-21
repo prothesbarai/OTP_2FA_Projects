@@ -4,15 +4,20 @@
  */
 package otp_verification;
 
+import java.util.Random;
+
 /**
  *
  * @author Asp Prothes
  */
 public class OTP_Verifications extends javax.swing.JFrame {
 
-    /**
-     * Creates new form OTP_Verifications
-     */
+    // Variable Declaration;
+    public int x;
+    private String generatedOTP = "";
+    private long otpGenerationTime;
+    private int timeLeft = 60;
+
     public OTP_Verifications() {
         initComponents();
     }
@@ -31,47 +36,85 @@ public class OTP_Verifications extends javax.swing.JFrame {
         showOTP = new javax.swing.JTextField();
         inputOTP = new javax.swing.JTextField();
         matchOutput = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        countField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         sendOTP.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         sendOTP.setText("Send OTP");
+        sendOTP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendOTPActionPerformed(evt);
+            }
+        });
 
         matchOTP1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         matchOTP1.setText("Match OTP");
+        matchOTP1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                matchOTP1ActionPerformed(evt);
+            }
+        });
 
         showOTP.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         showOTP.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         inputOTP.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         inputOTP.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        inputOTP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inputOTPActionPerformed(evt);
+            }
+        });
 
         matchOutput.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         matchOutput.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        matchOutput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                matchOutputActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setText("Count : ");
+
+        countField.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        countField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        countField.setText("TC");
+        countField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                countFieldActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(107, Short.MAX_VALUE)
-                .addComponent(matchOTP1, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(105, 105, 105))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(showOTP)
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(94, 94, 94)
-                .addComponent(sendOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(inputOTP)
-                .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(matchOutput)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(inputOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(matchOTP1, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(100, 100, 100)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(sendOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel1)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(countField, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(matchOutput)
+                            .addComponent(showOTP, javax.swing.GroupLayout.Alignment.LEADING))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -79,19 +122,74 @@ public class OTP_Verifications extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(showOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(33, 33, 33)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(countField, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(32, 32, 32)
                 .addComponent(sendOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(inputOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(matchOTP1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(matchOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(inputOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(matchOTP1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(matchOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void sendOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendOTPActionPerformed
+        // Define OTP Length
+        int otpLength = 6;
+        // Generate OTP with the specified length
+        Random rand = new Random();
+        StringBuilder otpBuilder = new StringBuilder();
+        for (int i = 0; i < otpLength; i++) {
+            otpBuilder.append(rand.nextInt(10));
+        }
+        
+        generatedOTP = otpBuilder.toString();
+        showOTP.setText(generatedOTP);
+        otpGenerationTime = System.currentTimeMillis();
+        
+        // Set the timer to invalidate OTP after 5 seconds
+        /*Timer timer = new Timer();
+        timer.schedule(new TimerTask(){
+            @Override
+            public void run() {
+                generatedOTP = ""; // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                showOTP.setText("Time Out");
+            }
+            
+        },60000);*/
+    }//GEN-LAST:event_sendOTPActionPerformed
+
+    private void inputOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputOTPActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_inputOTPActionPerformed
+
+    private void matchOTP1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_matchOTP1ActionPerformed
+        String getNumber = inputOTP.getText();
+        if (!getNumber.isEmpty()) {
+            if (getNumber.equals(generatedOTP)) {
+                matchOutput.setText("Success");
+            } else {
+                matchOutput.setText("Invalid OTP");
+            }
+        }else{
+            matchOutput.setText(null);
+        }
+    }//GEN-LAST:event_matchOTP1ActionPerformed
+
+    private void matchOutputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_matchOutputActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_matchOutputActionPerformed
+
+    private void countFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_countFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_countFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -129,7 +227,9 @@ public class OTP_Verifications extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField countField;
     private javax.swing.JTextField inputOTP;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JButton matchOTP1;
     private javax.swing.JTextField matchOutput;
     private javax.swing.JButton sendOTP;

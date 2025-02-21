@@ -5,6 +5,8 @@
 package otp_verification;
 
 import java.util.Random;
+import javax.swing.Timer;
+
 
 /**
  *
@@ -13,10 +15,9 @@ import java.util.Random;
 public class OTP_Verifications extends javax.swing.JFrame {
 
     // Variable Declaration;
-    public int x;
-    private String generatedOTP = "";
-    private long otpGenerationTime;
-    private int timeLeft = 60;
+    private volatile String generatedOTP = "";
+    private long otpExpirationTime;
+    private Timer countdownTimer;
 
     public OTP_Verifications() {
         initComponents();
@@ -92,29 +93,28 @@ public class OTP_Verifications extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(100, 100, 100)
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(countField, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(inputOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(matchOTP1, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(100, 100, 100)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(sendOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel1)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(countField, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE))
+                            .addComponent(showOTP)
+                            .addComponent(matchOutput)))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(matchOutput)
-                            .addComponent(showOTP, javax.swing.GroupLayout.Alignment.LEADING))))
+                        .addComponent(inputOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                        .addComponent(matchOTP1, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(sendOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(124, 124, 124)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -152,18 +152,26 @@ public class OTP_Verifications extends javax.swing.JFrame {
         
         generatedOTP = otpBuilder.toString();
         showOTP.setText(generatedOTP);
-        otpGenerationTime = System.currentTimeMillis();
         
-        // Set the timer to invalidate OTP after 5 seconds
-        /*Timer timer = new Timer();
-        timer.schedule(new TimerTask(){
-            @Override
-            public void run() {
-                generatedOTP = ""; // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-                showOTP.setText("Time Out");
+        
+        otpExpirationTime = System.currentTimeMillis() + 60000;
+        
+        if(countdownTimer != null && countdownTimer.isRunning()){
+            countdownTimer.stop();
+        }
+        countdownTimer = new Timer(100,(e) -> {
+            long remainingTime = otpExpirationTime - System.currentTimeMillis();
+            if(remainingTime > 0){
+                long seconds = remainingTime / 1000;
+                countField.setText(seconds + "s");
+            }else{
+               generatedOTP = "";
+               showOTP.setText("Time Out");
+               countField.setText("TC");
+               countdownTimer.stop();
             }
-            
-        },60000);*/
+        });
+        countdownTimer.start();
     }//GEN-LAST:event_sendOTPActionPerformed
 
     private void inputOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputOTPActionPerformed

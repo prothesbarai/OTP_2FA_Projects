@@ -4,9 +4,15 @@
  */
 package otp_verification;
 
+import java.awt.HeadlessException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
-
 
 /**
  *
@@ -34,11 +40,12 @@ public class OTP_Verifications extends javax.swing.JFrame {
 
         sendOTP = new javax.swing.JButton();
         matchOTP1 = new javax.swing.JButton();
-        showOTP = new javax.swing.JTextField();
+        mobileNumberField = new javax.swing.JTextField();
         inputOTP = new javax.swing.JTextField();
         matchOutput = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         countField = new javax.swing.JTextField();
+        showOTP = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -58,8 +65,8 @@ public class OTP_Verifications extends javax.swing.JFrame {
             }
         });
 
-        showOTP.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        showOTP.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        mobileNumberField.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        mobileNumberField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         inputOTP.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         inputOTP.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -89,6 +96,9 @@ public class OTP_Verifications extends javax.swing.JFrame {
             }
         });
 
+        showOTP.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        showOTP.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -104,8 +114,9 @@ public class OTP_Verifications extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(showOTP)
-                            .addComponent(matchOutput)))
+                            .addComponent(mobileNumberField)
+                            .addComponent(matchOutput)
+                            .addComponent(showOTP)))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(inputOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -121,6 +132,8 @@ public class OTP_Verifications extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(mobileNumberField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(showOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -133,7 +146,7 @@ public class OTP_Verifications extends javax.swing.JFrame {
                     .addComponent(inputOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(matchOTP1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(matchOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
+                .addComponent(matchOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -149,30 +162,78 @@ public class OTP_Verifications extends javax.swing.JFrame {
         for (int i = 0; i < otpLength; i++) {
             otpBuilder.append(rand.nextInt(10));
         }
-        
+
         generatedOTP = otpBuilder.toString();
         showOTP.setText(generatedOTP);
+
+        // মোবাইল নম্বর ইনপুট নেওয়া হচ্ছে
+        String mobileNumber = mobileNumberField.getText().trim();
+
         
+
         // Coundown Start Here ==========
         otpExpirationTime = System.currentTimeMillis() + 60000;
-        if(countdownTimer != null && countdownTimer.isRunning()){
+        if (countdownTimer != null && countdownTimer.isRunning()) {
             countdownTimer.stop();
         }
-        countdownTimer = new Timer(100,(e) -> {
+        countdownTimer = new Timer(100, (e) -> {
             long remainingTime = otpExpirationTime - System.currentTimeMillis();
-            if(remainingTime > 0){
+            if (remainingTime > 0) {
                 long seconds = remainingTime / 1000;
                 countField.setText(seconds + "s");
-            }else{
-               generatedOTP = "";
-               showOTP.setText("Time Out");
-               countField.setText("TC");
-               countdownTimer.stop();
+            } else {
+                generatedOTP = "";
+                mobileNumberField.setText("Time Out");
+                countField.setText("TC");
+                countdownTimer.stop();
             }
         });
         countdownTimer.start();
         // Coundown End Here ============
+        
+        if (mobileNumber.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Give me a phn munber", "error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // OTP পাঠানোর ফাংশন কল করা হচ্ছে
+        sendOTPToMobile(mobileNumber, generatedOTP);                                      
     }//GEN-LAST:event_sendOTPActionPerformed
+    // OTP মোবাইলে পাঠানোর ফাংশন
+    private void sendOTPToMobile(String mobileNumber, String otp) {
+        try {
+            String apiUrl = "https://textbelt.com/text";
+            String message = "আপনার OTP হল: " + otp;
+           
+
+            // API এর জন্য POST ডাটা প্রস্তুত করা
+            //String postData = "api_key=" + apiKey + "&to=" + mobileNumber + "&message=" + message + "&sender=" + senderID;
+            String postData = "phone=" + mobileNumber + "&message=" + message + "&key=textbelt";
+
+            // HTTP সংযোগ সেটআপ
+            URL url = new URL(apiUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            // ডাটা পাঠানো হচ্ছে
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(postData.getBytes(StandardCharsets.UTF_8));
+            }
+
+            // সার্ভার থেকে রেসপন্স নেওয়া
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 200) {
+                JOptionPane.showMessageDialog(null, "OTP সফলভাবে পাঠানো হয়েছে!", "সফলতা", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "OTP পাঠানো যায়নি, দয়া করে আবার চেষ্টা করুন!", "ত্রুটি", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (HeadlessException | IOException e) {
+            JOptionPane.showMessageDialog(null, "OTP পাঠানোর সময় সমস্যা হয়েছে!", "ত্রুটি", JOptionPane.ERROR_MESSAGE);
+        }
+    }  
+    
 
     private void inputOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputOTPActionPerformed
         // TODO add your handling code here:
@@ -186,7 +247,7 @@ public class OTP_Verifications extends javax.swing.JFrame {
             } else {
                 matchOutput.setText("Invalid OTP");
             }
-        }else{
+        } else {
             matchOutput.setText(null);
         }
     }//GEN-LAST:event_matchOTP1ActionPerformed
@@ -240,6 +301,7 @@ public class OTP_Verifications extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton matchOTP1;
     private javax.swing.JTextField matchOutput;
+    private javax.swing.JTextField mobileNumberField;
     private javax.swing.JButton sendOTP;
     private javax.swing.JTextField showOTP;
     // End of variables declaration//GEN-END:variables

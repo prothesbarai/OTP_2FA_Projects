@@ -153,9 +153,8 @@ public class OTP_Verifications extends javax.swing.JFrame {
         generatedOTP = otpBuilder.toString();
         showOTP.setText(generatedOTP);
         
-        
+        // Coundown Start Here ==========
         otpExpirationTime = System.currentTimeMillis() + 60000;
-        
         if(countdownTimer != null && countdownTimer.isRunning()){
             countdownTimer.stop();
         }
@@ -172,6 +171,7 @@ public class OTP_Verifications extends javax.swing.JFrame {
             }
         });
         countdownTimer.start();
+        // Coundown End Here ============
     }//GEN-LAST:event_sendOTPActionPerformed
 
     private void inputOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputOTPActionPerformed

@@ -203,7 +203,7 @@ public class OTP_Verifications extends javax.swing.JFrame {
     private void sendOTPToMobile(String mobileNumber, String otp) {
         try {
             String apiUrl = "https://textbelt.com/text";
-            String message = "আপনার OTP হল: " + otp;
+            String message = "Your OTP is: " + otp;
            
 
             // API এর জন্য POST ডাটা প্রস্তুত করা
@@ -225,12 +225,12 @@ public class OTP_Verifications extends javax.swing.JFrame {
             // সার্ভার থেকে রেসপন্স নেওয়া
             int responseCode = conn.getResponseCode();
             if (responseCode == 200) {
-                JOptionPane.showMessageDialog(null, "OTP সফলভাবে পাঠানো হয়েছে!", "সফলতা", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "OTP - Sent successfully.!", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(null, "OTP পাঠানো যায়নি, দয়া করে আবার চেষ্টা করুন!", "ত্রুটি", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "OTP - Could not send, please try again!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (HeadlessException | IOException e) {
-            JOptionPane.showMessageDialog(null, "OTP পাঠানোর সময় সমস্যা হয়েছে!", "ত্রুটি", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "OTP - There was a sending problem!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }  
     

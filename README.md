@@ -50,8 +50,6 @@ We welcome contributions to enhance the OTP Verification Project! To contribute:
 - **Push to the branch:** git push origin feature/YourFeature.
 Submit a pull request.
 
-
-
 ## License 📜
 This project is licensed under the MIT License - see the LICENSE file for details.
 
